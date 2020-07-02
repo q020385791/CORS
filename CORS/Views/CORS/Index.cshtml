@@ -12,9 +12,67 @@
        
         $.getJSON('https://sta.ci.taiwan.gov.tw/STA_AirQuality_v2/v1.0/Datastreams?$expand=Thing,Observations($orderby=phenomenonTime%20desc;$top=1)&$filter=name%20eq%20%27PM2.5%27%20and%20Thing/properties/authority%20eq%20%27%E8%A1%8C%E6%94%BF%E9%99%A2%E7%92%B0%E5%A2%83%E4%BF%9D%E8%AD%B7%E7%BD%B2%27%20and%20substringof(%27%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E6%B8%AC%E7%AB%99%27,Thing/name)&$count=true', function (data) {
 
-            alert(JSON.stringify(data));
+            //alert(JSON.stringify(data));
+
+            $("#ShowData").append(JSON.stringify(data.value[1]));
+
         });
 
+    }
+    //空氣品質指標(AQI)
+    function AQI()
+    {
+        $.getJSON('https://data.epa.gov.tw/api/v1/aqx_p_432?limit=1000&api_key=9be7b239-557b-4c10-9775-78cadfc555e9&format=json', function (data) {
+
+            //alert(JSON.stringify(data));
+            //$("#ShowData").append(JSON.stringify(data.records));
+            //$("#ShowData").append(JSON.stringify(data.fields[0].info.label));
+
+            //Header
+            $("#dataheader").append("<tr>");
+            for (var i = 0; i < data.fields.length; i++) {
+                $("#dataheader").append("<td>" + data.fields[i].info.label+"</td>");
+            }
+            $("#dataheader").append("</tr>");
+
+
+            //fill data
+            for (var i = 0; i < data.records.length; i++) {
+
+                $("#databody").append("<tr>");
+
+                $("#databody").append("<td>" + data.records[i].SiteName + "</td>");
+                $("#databody").append("<td>" + data.records[i].County + "</td>");
+                $("#databody").append("<td>" + data.records[i].AQI + "</td>");
+                $("#databody").append("<td>" + data.records[i].Pollutant + "</td>");
+                $("#databody").append("<td>" + data.records[i].Status + "</td>");
+                $("#databody").append("<td>" + data.records[i].SO2 + "</td>");
+                $("#databody").append("<td>" + data.records[i].CO + "</td>");
+                $("#databody").append("<td>" + data.records[i].CO_8hr + "</td>");
+                $("#databody").append("<td>" + data.records[i].O3 + "</td>");
+                $("#databody").append("<td>" + data.records[i].O3_8hr + "</td>");
+                $("#databody").append("<td>" + data.records[i].PM10 + "</td>");
+                $("#databody").append("<td>" + data.records[i]["PM2.5"] + "</td>");
+                $("#databody").append("<td>" + data.records[i].NO2 + "</td>");
+                $("#databody").append("<td>" + data.records[i].NOx + "</td>");
+                $("#databody").append("<td>" + data.records[i].NO + "</td>");
+                $("#databody").append("<td>" + data.records[i].WindSpeed + "</td>");
+                $("#databody").append("<td>" + data.records[i].WindDirec + "</td>");
+                $("#databody").append("<td>" + data.records[i].PublishTime + "</td>");
+                $("#databody").append("<td>" + data.records[i]["PM2.5_AVG"] + "</td>");
+                $("#databody").append("<td>" + data.records[i].PM10_AVG + "</td>");
+                $("#databody").append("<td>" + data.records[i].SO2_AVG + "</td>");
+                $("#databody").append("<td>" + data.records[i].Longitude + "</td>");
+                $("#databody").append("<td>" + data.records[i].Latitude + "</td>");
+                $("#databody").append("<td>" + data.records[i].SiteId + "</td>");
+                $("#databody").append("<td>" + data.records[i].ImportDate + "</td>");
+
+
+                $("#databody").append("</tr>");
+
+
+            }
+        });
     }
 
 </script>
@@ -27,7 +85,21 @@
 </head>
 <body>
 
-    <button onclick="GetData()"></button>
+    <button onclick="GetData()">Getdata</button>
+
+    <button onclick="AQI()">GetAQI</button>
+   <div id="ShowData"></div>
+
+
+    <table id="dataTable">
+       <thead id="dataheader">
+
+       </thead>
+        <tbody id="databody">
+
+
+        </tbody>
+    </table>
 
 </body>
 </html>
