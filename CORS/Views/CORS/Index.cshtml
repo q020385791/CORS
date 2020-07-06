@@ -100,22 +100,20 @@
         $.getJSON('https://data.epa.gov.tw/api/v1/aqx_p_432?limit=1000&api_key=9be7b239-557b-4c10-9775-78cadfc555e9&format=json', function (data) {
 
             ResetDataTable();
-
-            var Jsonstring = "";
             var keyword = $("#keyword").val();
-            //$("#ShowData").append(JSON.stringify(data.value[1]));
-
             FillHeader(data);
             //fill data
             
             for (var i = 0; i < data.records.length; i++)
             {
+                //取得該站名稱
                 var ThisSiteName = data.records[i].SiteName;
+                //每個字拆開比對
                 var Arraystring = Array.from(ThisSiteName);
                 for (var j = 0; j < Arraystring.length; j++) {
+                    //如果有跟關鍵字一樣的
                     if (Arraystring[j] == keyword) {
                        
-
                         $("#databody").append("<tr>");
 
                         $("#databody").append("<td>" + data.records[i].SiteName + "</td>");
@@ -143,25 +141,12 @@
                         $("#databody").append("<td>" + data.records[i].Latitude + "</td>");
                         $("#databody").append("<td>" + data.records[i].SiteId + "</td>");
                         $("#databody").append("<td>" + data.records[i].ImportDate + "</td>");
-
-
                         $("#databody").append("</tr>");
-
-                        //$("#ShowData").append(JSON.stringify(data.records[i].SiteName));
-
-
 
                     }
                 }
-
-                
-
             }
-
-        });
-
-
-       
+        });    
     }
 
     //以測站編號編排
@@ -172,8 +157,6 @@
 
             FillHeader(data);
             FillAQIData(data);
-
-            //$("#ShowData").append(JSON.stringify(data));
         });
 
 
@@ -185,15 +168,7 @@
         ResetDataTable();
         $.getJSON('https://data.epa.gov.tw/api/v1/aqx_p_432?limit=1000&api_key=9be7b239-557b-4c10-9775-78cadfc555e9&format=json', function (data) {
 
-            //alert(JSON.stringify(data));
-            //$("#ShowData").append(JSON.stringify(data.records));
-            //$("#ShowData").append(JSON.stringify(data.fields[0].info.label));
-
-            //Header
             FillHeader(data);
-
-
-            //fill data
             FillAQIData(data);
         });
     }
