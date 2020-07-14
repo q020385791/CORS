@@ -5,16 +5,44 @@
 
 <!DOCTYPE html>
 <script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.18/vue.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=yourkey&libraries=places&callback=googleSearchInit"async defer></script>
+
+
+
 @*<script src="~/js/AQI.js"></script>*@
 
 
 
 <script type="text/javascript">
-   
 
+    //引用Place API的時候會直接呼叫此Function 要改名稱的話要改變引用該API的callback的值
+    function googleSearchInit() {
+        
+        //要放搜尋框的參數是哪一個input
+        var input = document.getElementById('pac-input');
+
+        //將該搜尋框注入自動搜尋
+        var autocomplete = new google.maps.places.Autocomplete(input);
+
+        //查詢按鈕
+        $("#btnGetLocation").click(function () {
+            var place = autocomplete.getPlace();
+            if (!place.geometry) {
+                window.alert("您輸入的地點沒有類似地點哦'" + place.name + "'");
+                return;
+            }
+            //輸出經緯度
+            var Thislocation = place.geometry.location;
+            var x = Thislocation.lat();
+            var y = Thislocation.lng();
+            alert(x);
+            alert(y);
+        });
+    }
     //function GetData()
     //{
-       
+
     //    $.getJSON('https://sta.ci.taiwan.gov.tw/STA_AirQuality_v2/v1.0/Datastreams?$expand=Thing,Observations($orderby=phenomenonTime%20desc;$top=1)&$filter=name%20eq%20%27PM2.5%27%20and%20Thing/properties/authority%20eq%20%27%E8%A1%8C%E6%94%BF%E9%99%A2%E7%92%B0%E5%A2%83%E4%BF%9D%E8%AD%B7%E7%BD%B2%27%20and%20substringof(%27%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E6%B8%AC%E7%AB%99%27,Thing/name)&$count=true', function (data) {
 
     //        //alert(JSON.stringify(data));
@@ -26,8 +54,7 @@
     //}
 
 
-    function FillHeader(data)
-    {
+    function FillHeader(data) {
         $("#dataheader").append("<tr>");
         for (var i = 0; i < data.fields.length; i++) {
             $("#dataheader").append("<td>" + data.fields[i].info.label + "</td>");
@@ -36,8 +63,7 @@
 
     }
 
-    function FillAQIData(data)
-    {
+    function FillAQIData(data) {
         for (var i = 0; i < data.records.length; i++) {
 
             $("#databody").append("<tr>");
@@ -75,15 +101,13 @@
         }
     }
 
-    function ResetDataTable()
-    {
+    function ResetDataTable() {
         $("#dataheader").empty();
         $("#databody").empty();
     }
 
 
-    function GetData()
-    {
+    function GetData() {
 
         $.getJSON('https://sta.ci.taiwan.gov.tw/STA_AirQuality_v2/v1.0/Datastreams?$expand=Thing,Observations($orderby=phenomenonTime%20desc;$top=1)&$filter=name%20eq%20%27PM2.5%27%20and%20Thing/properties/authority%20eq%20%27%E8%A1%8C%E6%94%BF%E9%99%A2%E7%92%B0%E5%A2%83%E4%BF%9D%E8%AD%B7%E7%BD%B2%27%20and%20substringof(%27%E7%A9%BA%E6%B0%A3%E5%93%81%E8%B3%AA%E6%B8%AC%E7%AB%99%27,Thing/name)&$count=true', function (data) {
 
@@ -95,17 +119,15 @@
 
     }
     //以測站名稱搜尋關鍵字
-    function GetDataBySiteName()
-    {
+    function GetDataBySiteName() {
         $.getJSON('https://data.epa.gov.tw/api/v1/aqx_p_432?limit=1000&api_key=9be7b239-557b-4c10-9775-78cadfc555e9&format=json', function (data) {
 
             ResetDataTable();
             var keyword = $("#keyword").val();
             FillHeader(data);
             //fill data
-            
-            for (var i = 0; i < data.records.length; i++)
-            {
+
+            for (var i = 0; i < data.records.length; i++) {
                 //取得該站名稱
                 var ThisSiteName = data.records[i].SiteName;
                 //每個字拆開比對
@@ -113,7 +135,7 @@
                 for (var j = 0; j < Arraystring.length; j++) {
                     //如果有跟關鍵字一樣的
                     if (Arraystring[j] == keyword) {
-                       
+
                         $("#databody").append("<tr>");
 
                         $("#databody").append("<td>" + data.records[i].SiteName + "</td>");
@@ -146,12 +168,14 @@
                     }
                 }
             }
-        });    
+        });
     }
 
+
+
+
     //以測站編號編排
-    function GetDataOrderbySiteId()
-    {
+    function GetDataOrderbySiteId() {
         ResetDataTable();
         $.getJSON('https://data.epa.gov.tw/api/v1/aqx_p_432?limit=1000&api_key=9be7b239-557b-4c10-9775-78cadfc555e9&format=json&orderby=SiteId', function (data) {
 
@@ -161,10 +185,9 @@
 
 
     }
- 
+
     //空氣品質指標(AQI)
-    function AQI()
-    {
+    function AQI() {
         ResetDataTable();
         $.getJSON('https://data.epa.gov.tw/api/v1/aqx_p_432?limit=1000&api_key=9be7b239-557b-4c10-9775-78cadfc555e9&format=json', function (data) {
 
@@ -183,8 +206,23 @@
 </head>
 <body>
 
-    <button onclick="GetData()">Getdata</button>
+    <!-- google place api-->
+    <div class="pac-card" id="pac-card">
+        <div id="pac-container">
+            <input id="pac-input" type="text"
+                   placeholder="Enter a location">
+        </div>
+        <button id="btnGetLocation">取得地點</button>
+    </div>
+    <!-- google place api-->
 
+
+
+
+
+
+
+    <button onclick="GetData()">Getdata</button>
     <button onclick="AQI()">GetAQI</button>
     <button onclick="GetDataBySiteName()">GetDataBySiteName</button>
     <input id="keyword" type="text" />
@@ -203,3 +241,4 @@
 
 </body>
 </html>
+
